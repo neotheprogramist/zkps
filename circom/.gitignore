@@ -1,0 +1,14 @@
+# ceremony
+*.ptau
+*.r1cs
+*.zkey
+verification_key.json
+
+# execution
+*.wtns
+proof.json
+
+# binaries
+*_cpp
+*_js
+*.sym
