@@ -1,0 +1,13 @@
+# Rust
+/target
+Cargo.lock
+
+# VSCode
+.vscode/
+
+# Circuit-related generated files
+/*.crct
+/*.tbl
+/*.bin
+/*.json
+/*.sol

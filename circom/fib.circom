@@ -1,17 +1,14 @@
 pragma circom 2.0.0;
 
-/*This circuit template checks that c is the multiplication of a and b.*/  
-
-template Square () {  
-
-   // Declaration of signals.
+template Fibb (m) {
    signal input n;
-   signal b;  
-   signal output c;  
+   signal output r;
+   signal fib[m+1];
 
-   // Constraints.
-   b <== n;
-   c <== b * n;
+   fib[0] <== 0;
+   fib[1] <== 1;
+
+   r <== fib[n] * n * n;
 }
 
-component main = Square();
+component main = Fibb(2);

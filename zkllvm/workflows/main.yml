@@ -1,0 +1,65 @@
+name: rust_tutorial_check
+
+on:
+  push:
+    branches: [ master ]
+    paths-ignore:
+          - '**/README.md'
+  pull_request:
+    paths-ignore:
+          - '**/README.md'
+
+concurrency:
+  group: ${{
+    ( github.ref == 'refs/heads/master' &&
+    format('{0}/{1}', github.run_id, github.run_attempt) )
+    ||
+    format('{0}/{1}', github.workflow, github.ref) }}
+  cancel-in-progress: true
+
+jobs:
+  test-zkllvm-rust-workflow:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install zkLLVM DEB package
+        run: |
+          sudo bash -c "echo 'deb [trusted=yes]  http://deb.nil.foundation/ubuntu/ all main' >>/etc/apt/sources.list"
+          sudo apt update
+          sudo apt install -y zkllvm proof-producer
+
+      - name: Install Rust zkLLVM toolchain
+        run: |
+          curl --proto '=https' --tlsv1.2 -O https://cdn.jsdelivr.net/gh/NilFoundation/zkllvm@master/rslang-installer.py
+          python3.10 rslang-installer.py --channel nightly
+
+      - name: Check the installation
+        run: |
+          rustc +zkllvm --version
+          assigner --version
+
+      - name: Build code
+        run: cargo +zkllvm build --release --target assigner-unknown-unknown --features=zkllvm
+
+      - name: Generate circuit and assignment table
+        run: |
+          assigner \
+            -b target/assigner-unknown-unknown/release/zkllvm-rust-template.ll \
+            -i inputs/example.inp \
+            -t assignment.tbl \
+            -c circuit.crct \
+            -e pallas
+
+      - name: Generate proof
+        run: |
+          proof-generator-single-threaded \
+            --circuit circuit.crct \
+            --assignment assignment.tbl \
+            --proof proof.bin
