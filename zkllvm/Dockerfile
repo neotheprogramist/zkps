@@ -12,6 +12,6 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://cdn.jsdelivr.net/gh/NilFoundati
 # CMD rustc +zkllvm --version && assigner --version
 
 WORKDIR /app
-COPY entrypoint.sh entrypoint.sh
+COPY . .
 
 ENTRYPOINT ["/app/entrypoint.sh"]
