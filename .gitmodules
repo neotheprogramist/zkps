@@ -1,0 +1,3 @@
+[submodule "zkllvm/verifier/lib/forge-std"]
+	path = zkllvm/verifier/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
