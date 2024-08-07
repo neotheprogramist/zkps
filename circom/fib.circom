@@ -1,14 +1,16 @@
 pragma circom 2.0.0;
 
-template Fibb (m) {
-   signal input n;
-   signal output r;
-   signal fib[m+1];
+template Fibonacci(n) {
+  signal output out;
 
-   fib[0] <== 0;
-   fib[1] <== 1;
-
-   r <== fib[n] * n * n;
+  component f1, f2;
+  if (n <= 1) {
+    out <== n;
+  } else {
+    f1 = Fibonacci(n-1);
+    f2 = Fibonacci(n-2);
+    out <== f1.out + f2.out ;
+  }
 }
 
-component main = Fibb(2);
+component main = Fibonacci(5);

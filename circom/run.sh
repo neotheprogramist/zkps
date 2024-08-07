@@ -3,12 +3,12 @@
 # Based on https://docs.circom.io/getting-started/compiling-circuits/
 
 name="fib"
-SHIP_CEREMONY=
+SHIP_CEREMONY=1
 
 # compile
 
-circom $name.circom --r1cs --wasm --sym --c || exit 1
-
+`circom $name.circom --r1cs --wasm --sym --c || exit 1
+`
 # witness
 
 
@@ -28,8 +28,8 @@ echo "PROVING"
 node "$name"_js/generate_witness.js "$name"_js/$name.wasm input.json witness.wtns
 snarkjs groth16 prove "$name"_0001.zkey witness.wtns proof.json public.json
 
-echo "VERIFYING"
+# echo "VERIFYING"
 
-snarkjs groth16 verify verification_key.json public.json proof.json
+# snarkjs groth16 verify verification_key.json public.json proof.json
 
-cat public.json
+# cat public.json
