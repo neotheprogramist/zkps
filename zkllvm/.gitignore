@@ -11,3 +11,6 @@ Cargo.lock
 /*.bin
 /*.json
 /*.sol
+/*.dat
+verifier
+proving.log
