@@ -1,4 +1,4 @@
-# Setting up env
+# Setting up
 
 ZKLLVM binaries are released only for the debian based systems. They can be build from source, but this process needs additional configuration of both source files (CMAKE files), as well as system.
 
