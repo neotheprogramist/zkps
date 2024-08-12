@@ -22,7 +22,7 @@ fn main() {
     // ExecutorEnvBuilder::build().
 
     // For example:
-    let input: u32 = 24;
+    let input: u32 = 23;
     let env = ExecutorEnv::builder()
         .write(&input)
         .unwrap()
