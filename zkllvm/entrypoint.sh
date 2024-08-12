@@ -12,6 +12,4 @@ assigner -b target/assigner-unknown-unknown/release/zkllvm-rust-template.ll -i i
 # Generate proof
 proof-generator-multi-threaded --circuit circuit.crct --assignment assignment.tbl --proof proof.bin >> $LOG_FILE
 
-tar -czf proof.tgz verifier circuit.crct proof.bin $LOG_FILE 
-
-cat proof.tgz
+tar -czf proof.tgz verifier circuit.crct proof.bin $LOG_FILE && cat proof.tgz || cat $LOG_FILE
