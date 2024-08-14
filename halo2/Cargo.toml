@@ -1,0 +1,10 @@
+[package]
+name = "halo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+halo2 = "0.0.0"
+halo2_gadgets = "0.3.0"
+halo2_proofs = { version = "0.3.0", features = ["dev-graph"] }
+plotters = "0.3.6"
