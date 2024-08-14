@@ -2,10 +2,8 @@ use std::marker::PhantomData;
 
 use halo2_proofs::{
     arithmetic::Field,
-    circuit::{AssignedCell, Chip, Layouter, Region, SimpleFloorPlanner, Value},
-    dev::MockProver,
-    pasta::Fp,
-    plonk::{Advice, Circuit, Column, ConstraintSystem, Error, Fixed, Instance, Selector},
+    circuit::{AssignedCell, Chip, Layouter, Region, Value},
+    plonk::{Advice, Column, ConstraintSystem, Error, Fixed, Instance, Selector},
     poly::Rotation,
 };
 
