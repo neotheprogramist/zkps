@@ -11,9 +11,10 @@ fn main() {
 
     // Prepare the private and public inputs to the circuit!
     let constant = Fp::from(7);
-    let a = Fp::from(2);
-    let b = Fp::from(3);
-    let c = constant * a.square() * b.square();
+    let a = Fp::from(1);
+    let b = Fp::from(2);
+    // let c = constant * a.square() * b.square();
+    let c = Fp::from(3);
 
     // Instantiate the circuit with the private inputs.
     let circuit = MyCircuit {
@@ -21,6 +22,13 @@ fn main() {
         a: Value::known(a),
         b: Value::known(b),
     };
+
+    // Arrange the public input. We expose the multiplication result in row 0
+    // of the instance column, so we position it there in our public inputs.
+    let mut public_inputs = vec![c];
+
+    // Given the correct public input, our circuit will verify.
+    let prover = MockProver::run(k, &circuit, vec![public_inputs.clone()]).unwrap();
 
     use plotters::prelude::*;
     let root = BitMapBackend::new("layout.png", (1024, 768)).into_drawing_area();
@@ -34,18 +42,12 @@ fn main() {
         .view_width(0..4)
         .view_height(0..32)
         // You can hide labels, which can be useful with smaller areas.
-        .show_labels(false)
+        .show_labels(true)
         // Render the circuit onto your area!
         // The first argument is the size parameter for the circuit.
         .render(5, &circuit, &root)
         .unwrap();
 
-    // Arrange the public input. We expose the multiplication result in row 0
-    // of the instance column, so we position it there in our public inputs.
-    let mut public_inputs = vec![c];
-
-    // Given the correct public input, our circuit will verify.
-    let prover = MockProver::run(k, &circuit, vec![public_inputs.clone()]).unwrap();
     assert_eq!(prover.verify(), Ok(()));
 
     // If we try some other public input, the proof will fail!

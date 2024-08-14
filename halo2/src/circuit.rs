@@ -55,20 +55,11 @@ impl<F: Field> Circuit<F> for MyCircuit<F> {
         let constant =
             field_chip.load_constant(layouter.namespace(|| "load constant"), self.constant)?;
 
-        // We only have access to plain multiplication.
-        // We could implement our circuit as:
-        //     asq  = a*a
-        //     bsq  = b*b
-        //     absq = asq*bsq
-        //     c    = constant*asq*bsq
-        //
-        // but it's more efficient to implement it as:
-        //     ab   = a*b
-        //     absq = ab^2
-        //     c    = constant*absq
-        let ab = field_chip.mul(layouter.namespace(|| "a * b"), a, b)?;
-        let absq = field_chip.mul(layouter.namespace(|| "ab * ab"), ab.clone(), ab)?;
-        let c = field_chip.mul(layouter.namespace(|| "constant * absq"), constant, absq)?;
+        let ab = field_chip.add(layouter.namespace(|| "a + b"), a, b)?;
+        // let absq = field_chip.mul(layouter.namespace(|| "ab * ab"), ab.clone(), ab)?;
+        // let c = field_chip.mul(layouter.namespace(|| "constant * absq"), constant, absq)?;
+
+        let c = ab;
 
         // Expose the result as a public input to the circuit.
         field_chip.expose_public(layouter.namespace(|| "expose c"), c, 0)
