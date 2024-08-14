@@ -10,16 +10,13 @@ fn main() {
     let k = 4;
 
     // Prepare the private and public inputs to the circuit!
-    let constant = Fp::from(7);
     let a = Fp::from(1);
-    let b = Fp::from(2);
-    // let c = constant * a.square() * b.square();
-    let c = Fp::from(3);
+    let b = Fp::from(1);
+    let c = Fp::from(8);
 
     // Instantiate the circuit with the private inputs.
     let circuit = MyCircuit {
-        constant,
-        a: Value::known(a),
+        a,
         b: Value::known(b),
     };
 

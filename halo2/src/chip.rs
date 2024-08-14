@@ -18,12 +18,12 @@ pub trait NumericInstructions<F: Field>: Chip<F> {
     fn load_constant(&self, layouter: impl Layouter<F>, constant: F) -> Result<Self::Num, Error>;
 
     /// Returns `c = a + b`.
-    fn add(
+    fn switch_add(
         &self,
         layouter: impl Layouter<F>,
         a: Self::Num,
         b: Self::Num,
-    ) -> Result<Self::Num, Error>;
+    ) -> Result<(Self::Num, Self::Num), Error>;
 
     /// Exposes a number as a public input to the circuit.
     fn expose_public(
@@ -95,7 +95,7 @@ impl<F: Field> FieldChip<F> {
         let s_add = meta.selector();
 
         // Define our multiplication gate!
-        meta.create_gate("add", |meta| {
+        meta.create_gate("add_switch", |meta| {
             // To implement multiplication, we need three advice cells and a selector
             // cell. We arrange them like so:
             //
@@ -111,6 +111,7 @@ impl<F: Field> FieldChip<F> {
             let lhs = meta.query_advice(advice[0], Rotation::cur());
             let rhs = meta.query_advice(advice[1], Rotation::cur());
             let out = meta.query_advice(advice[0], Rotation::next());
+            let last = meta.query_advice(advice[1], Rotation::next());
             let s_mul = meta.query_selector(s_add);
 
             // Finally, we return the polynomial expressions that constrain this gate.
@@ -121,7 +122,10 @@ impl<F: Field> FieldChip<F> {
             // has the following properties:
             // - When s_mul = 0, any value is allowed in lhs, rhs, and out.
             // - When s_mul != 0, this constrains lhs * rhs = out.
-            vec![s_mul * (lhs + rhs - out)]
+            vec![
+                s_mul.clone() * (lhs.clone() + rhs - out),
+                s_mul * (lhs - last),
+            ]
         });
 
         FieldConfig {
@@ -173,16 +177,16 @@ impl<F: Field> NumericInstructions<F> for FieldChip<F> {
         )
     }
 
-    fn add(
+    fn switch_add(
         &self,
         mut layouter: impl Layouter<F>,
         a: Self::Num,
         b: Self::Num,
-    ) -> Result<Self::Num, Error> {
+    ) -> Result<(Self::Num, Self::Num), Error> {
         let config = self.config();
 
         layouter.assign_region(
-            || "add",
+            || "add_switch",
             |mut region: Region<'_, F>| {
                 // We only want to use a single multiplication gate in this region,
                 // so we enable it at region offset 0; this means it will constrain
@@ -198,13 +202,20 @@ impl<F: Field> NumericInstructions<F> for FieldChip<F> {
 
                 // Now we can assign the multiplication result, which is to be assigned
                 // into the output position.
+                let last = a.0.value().copied();
                 let value = a.0.value().copied() + b.0.value();
 
                 // Finally, we do the assignment to the output, returning a
                 // variable to be used in another part of the circuit.
-                region
+                let c = region
+                    .assign_advice(|| "lhs -> rhs", config.advice[1], 1, || last)
+                    .map(Number)?;
+
+                let a = region
                     .assign_advice(|| "lhs + rhs", config.advice[0], 1, || value)
-                    .map(Number)
+                    .map(Number)?;
+
+                Ok((a, c))
             },
         )
     }

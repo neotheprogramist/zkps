@@ -13,8 +13,7 @@ use crate::chip::{FieldChip, FieldConfig, NumericInstructions};
 /// were `None` we would get an error.
 #[derive(Default)]
 pub struct MyCircuit<F: Field> {
-    pub constant: F,
-    pub a: Value<F>,
+    pub a: F,
     pub b: Value<F>,
 }
 
@@ -48,18 +47,15 @@ impl<F: Field> Circuit<F> for MyCircuit<F> {
         let field_chip = FieldChip::<F>::construct(config);
 
         // Load our private values into the circuit.
-        let a = field_chip.load_private(layouter.namespace(|| "load a"), self.a)?;
-        let b = field_chip.load_private(layouter.namespace(|| "load b"), self.b)?;
+        let a = field_chip.load_private(layouter.namespace(|| "load a"), self.b)?;
 
         // Load the constant factor into the circuit.
-        let constant =
-            field_chip.load_constant(layouter.namespace(|| "load constant"), self.constant)?;
+        let b = field_chip.load_constant(layouter.namespace(|| "load constant b"), self.a)?;
 
-        let ab = field_chip.add(layouter.namespace(|| "a + b"), a, b)?;
-        // let absq = field_chip.mul(layouter.namespace(|| "ab * ab"), ab.clone(), ab)?;
-        // let c = field_chip.mul(layouter.namespace(|| "constant * absq"), constant, absq)?;
-
-        let c = ab;
+        let (a, b) = field_chip.switch_add(layouter.namespace(|| "a + b"), a, b)?;
+        let (a, b) = field_chip.switch_add(layouter.namespace(|| "a + b"), a, b)?;
+        let (a, b) = field_chip.switch_add(layouter.namespace(|| "a + b"), a, b)?;
+        let (c, _) = field_chip.switch_add(layouter.namespace(|| "a + b + a"), a, b)?;
 
         // Expose the result as a public input to the circuit.
         field_chip.expose_public(layouter.namespace(|| "expose c"), c, 0)
