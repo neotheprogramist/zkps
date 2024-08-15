@@ -4,7 +4,7 @@ use halo2_proofs::{
     plonk::{Circuit, ConstraintSystem, Error},
 };
 
-use crate::chip::{FieldChip, FieldConfig, NumericInstructions};
+use crate::chip::{FieldChip, FieldConfig, Number, NumericInstructions};
 
 /// The full circuit implementation.
 ///
@@ -15,6 +15,7 @@ use crate::chip::{FieldChip, FieldConfig, NumericInstructions};
 pub struct MyCircuit<F: Field> {
     pub a: F,
     pub b: Value<F>,
+    pub n: usize,
 }
 
 impl<F: Field> Circuit<F> for MyCircuit<F> {
@@ -46,18 +47,34 @@ impl<F: Field> Circuit<F> for MyCircuit<F> {
     ) -> Result<(), Error> {
         let field_chip = FieldChip::<F>::construct(config);
 
-        // Load our private values into the circuit.
-        let a = field_chip.load_private(layouter.namespace(|| "load a"), self.b)?;
-
         // Load the constant factor into the circuit.
-        let b = field_chip.load_constant(layouter.namespace(|| "load constant b"), self.a)?;
+        let a = field_chip.load_constant(layouter.namespace(|| "load constant b"), self.a)?;
 
-        let (a, b) = field_chip.switch_add(layouter.namespace(|| "a + b"), a, b)?;
-        let (a, b) = field_chip.switch_add(layouter.namespace(|| "a + b"), a, b)?;
-        let (a, b) = field_chip.switch_add(layouter.namespace(|| "a + b"), a, b)?;
-        let (c, _) = field_chip.switch_add(layouter.namespace(|| "a + b + a"), a, b)?;
+        // Load our private values into the circuit.
+        let b = field_chip.load_private(layouter.namespace(|| "load a"), self.b)?;
+
+        let (a, _) = fib(self.n - 1, a, b, &field_chip, &mut layouter)?;
 
         // Expose the result as a public input to the circuit.
-        field_chip.expose_public(layouter.namespace(|| "expose c"), c, 0)
+        field_chip.expose_public(layouter.namespace(|| "expose c"), a, 0)
     }
+}
+
+fn fib<F>(
+    n: usize,
+    a: Number<F>,
+    b: Number<F>,
+    chip: &FieldChip<F>,
+    layouter: &mut impl Layouter<F>,
+) -> Result<(Number<F>, Number<F>), Error>
+where
+    F: Field,
+{
+    if n == 0 {
+        return Ok((a, b));
+    }
+
+    let (a, b) = fib(n - 1, a, b, chip, layouter)?;
+
+    chip.switch_add(layouter.namespace(|| format!("add {}", n)), a, b)
 }
