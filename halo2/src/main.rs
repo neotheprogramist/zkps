@@ -7,18 +7,18 @@ mod circuit;
 fn main() {
     // The number of rows in our circuit cannot exceed 2^k. Since our example
     // circuit is very small, we can pick a very small value here.
-    let k = 10;
+    let k = 16;
 
     // Prepare the private and public inputs to the circuit!
     let a = Fp::from(1);
-    let b = Fp::from(1);
+    let b = Fp::from(0);
     let c = Fp::from(17711);
 
     // Instantiate the circuit with the private inputs.
     let circuit = MyCircuit {
         a,
         b: Value::known(b),
-        n: 19,
+        n: 22,
     };
 
     // Arrange the public input. We expose the multiplication result in row 0
@@ -105,7 +105,7 @@ fn test_circuit_4() {
     };
 
     let public_inputs = vec![Fp::from(3)];
-    let prover = MockProver::run(4, &circuit, vec![public_inputs.clone()]).unwrap();
+    let prover = MockProver::run(5, &circuit, vec![public_inputs.clone()]).unwrap();
 
     assert_eq!(prover.verify(), Ok(()));
 }
@@ -133,7 +133,7 @@ fn test_circuit_22() {
     };
 
     let public_inputs = vec![Fp::from(17711)];
-    let prover = MockProver::run(22, &circuit, vec![public_inputs.clone()]).unwrap();
+    let prover = MockProver::run(16, &circuit, vec![public_inputs.clone()]).unwrap();
 
     assert_eq!(prover.verify(), Ok(()));
 }

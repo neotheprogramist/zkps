@@ -74,7 +74,13 @@ where
         return Ok((a, b));
     }
 
-    let (a, b) = fib(n - 1, a, b, chip, layouter)?;
+    let (a, b) = if n == 1 {
+        fib(n - 1, a, b, chip, layouter)?
+    } else {
+        let (a_next, _b) = fib(n - 1, a.clone(), b.clone(), chip, layouter)?;
+        let (b_next, _b) = fib(n - 2, a, b, chip, layouter)?;
+        (a_next, b_next)
+    };
 
     chip.switch_add(layouter.namespace(|| format!("add {}", n)), a, b)
 }
