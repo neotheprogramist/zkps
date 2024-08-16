@@ -7,7 +7,7 @@ use ark_pallas::Fq;
 
 const ZERO: Fq = MontFp!("0x0");
 const ONE: Fq = MontFp!("0x1");
-const TWO: Fq = MontFp!("0x2");
+// const TWO: Fq = MontFp!("0x2");
 
 #[circuit]
 pub fn field_arithmetic_example(n: Fq) -> Fq {
@@ -21,5 +21,7 @@ fn fib(n: Fq) -> Fq {
         return ONE;
     }
 
-    fib(n - ONE) + fib(n - TWO) + ZERO
+    // fib(n - ONE) + fib(n - TWO) + ZERO
+
+    n
 }
