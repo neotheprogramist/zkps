@@ -1,0 +1,60 @@
+cairo-stone for n=3
+
+real	1m1.618s
+user	0m0.195s
+sys	0m0.169s
+
+--- zkllvm for n=3
+real	0m0.954s
+user	0m0.641s
+sys	0m1.117s
+
+--- noir for n=3
+real	0m1.109s
+user	0m11.082s
+sys	0m1.367s
+
+--- sp1 for n=3
+real	0m9.841s
+user	4m49.756s
+sys	0m9.784s
+
+--- cairo-stone for n=3
+real	1m1.766s
+user	0m0.209s
+sys	0m0.163s
+
+--- zkllvm for n=3
+real	0m0.967s
+user	0m0.613s
+sys	0m1.141s
+
+--- noir for n=3
+real	0m1.131s
+user	0m11.467s
+sys	0m1.375s
+
+--- sp1 for n=3
+real	0m10.297s
+user	4m55.971s
+sys	0m11.542s
+
+--- cairo-stone for n=20
+real	3m27.276s
+user	0m0.322s
+sys	0m0.269s
+
+--- zkllvm for n=20
+real	0m0.970s
+user	0m0.646s
+sys	0m1.112s
+
+--- noir for n=20
+real	0m1.219s
+user	0m11.227s
+sys	0m1.320s
+
+--- sp1 for n=20
+real	0m10.173s
+user	4m56.329s
+sys	0m10.804s

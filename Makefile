@@ -1,22 +1,35 @@
 ROOT := $(dir $(firstword $(MAKEFILE_LIST)))
 CAIRO_ROOT := $(ROOT)cairo/
 ZKLLVM_ROOT := $(ROOT)zkllvm/
+NOIR_ROOT := $(ROOT)noir/
+SP1_ROOT := $(ROOT)sp1/
 
 REC=records.txt
+PREFIX="\\n---"
 
-N := 3
+N := 20# Automatic only for cairo for now
 
-all: cairo
+all: cairo zkllvm noir sp1
 
 cairo: $(CAIRO_ROOT)src/lib.cairo
-	echo '["[$N]"]' > $(CAIRO_ROOT)input.json
-	echo cairo-stone for n=$(N) >> $(REC)
+	printf '["[$N]"]' > $(CAIRO_ROOT)input.json
+	printf "$(PREFIX) cairo-stone for n=$(N)" >> $(REC)
 	(cd $(CAIRO_ROOT) && ./run.sh 2>> ../$(REC))
 
 
 zkllvm:
-	echo "zkllvm for n=$(N)" >> $(REC)
-	(cd $(ZKLLVM_ROOT) && ./run.sh 2>> ../$(REC))
+	printf "$(PREFIX) zkllvm for n=$(N)" >> $(REC)
+	(cd $(ZKLLVM_ROOT) && ./run.sh 1>> ../$(REC))
+
+
+noir:
+	printf "$(PREFIX) noir for n=$(N)" >> $(REC)
+	(cd $(NOIR_ROOT) && ./run.sh 2>> ../$(REC))
+
+
+sp1: 
+	printf "$(PREFIX) sp1 for n=$(N)" >> $(REC)
+	(cd $(SP1_ROOT) && ./run.sh 2>> ../$(REC))
 
 
 clean:
