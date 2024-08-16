@@ -6,17 +6,17 @@ REC=records.txt
 
 N := 3
 
-all: zkllvm
+all: cairo
 
 cairo: $(CAIRO_ROOT)src/lib.cairo
 	echo '["[$N]"]' > $(CAIRO_ROOT)input.json
 	echo cairo-stone for n=$(N) >> $(REC)
-	(cd $(CAIRO_ROOT) && ./run.sh | tail -3 >> ../$(REC))
+	(cd $(CAIRO_ROOT) && ./run.sh 2>> ../$(REC))
+
 
 zkllvm:
 	echo "zkllvm for n=$(N)" >> $(REC)
-	(cd $(ZKLLVM_ROOT) && ./run.sh | tail -3 >> ../$(REC))
-
+	(cd $(ZKLLVM_ROOT) && ./run.sh 2>> ../$(REC))
 
 
 clean:
