@@ -3,16 +3,16 @@
 # Based on https://docs.circom.io/getting-started/compiling-circuits/
 
 name="fib"
-SHIP_CEREMONY=1
+SKIP_CEREMONY=
 
 # compile
 
-`circom $name.circom --r1cs --wasm --sym --c || exit 1
-`
+circom $name.circom --r1cs --wasm --sym --c || exit 1
+
 # witness
 
 
-if [[ -z "${SHIP_CEREMONY}" ]]; then
+if [[ -z "${SKIP_CEREMONY}" ]]; then
     snarkjs powersoftau new bn128 12 pot12_0000.ptau -v
     snarkjs powersoftau contribute pot12_0000.ptau pot12_0001.ptau --name="First contribution" < entropy.txt
 
@@ -25,8 +25,8 @@ fi
 
 echo "PROVING"
 
-node "$name"_js/generate_witness.js "$name"_js/$name.wasm input.json witness.wtns
-snarkjs groth16 prove "$name"_0001.zkey witness.wtns proof.json public.json
+node "$name"_js/generate_witness.js "$name"_js/$name.wasm input.json witness.wtns || exit 1
+{ time snarkjs groth16 prove "$name"_0001.zkey witness.wtns proof.json public.json 2>1; }
 
 # echo "VERIFYING"
 
