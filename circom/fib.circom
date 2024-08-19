@@ -1,16 +1,40 @@
 pragma circom 2.0.0;
 
-template Fibonacci(n) {
-  signal output out;
+template Factors(d) {
+  signal input n;
+  // signal output m;
+  signal output factors[d];
+  signal cumulative[d];
 
-  component f1, f2;
-  if (n <= 1) {
-    out <== n;
-  } else {
-    f1 = Fibonacci(n-1);
-    f2 = Fibonacci(n-2);
-    out <== f1.out + f2.out ;
+  var leftover = n;
+  var divider = 2;
+
+  // Throws `signal already assigned` when using a while loop.
+  for (var f = 0; f < d; f++) {
+    var factor;
+
+    while (leftover % divider != 0 && divider <= leftover) {
+      divider++;
+    }
+
+    if (divider > leftover) {
+      // No more factors to find, just have to pad with ones.
+      factor = 1;
+    } else {
+      factor = divider;
+      leftover = leftover / divider;
+    }
+
+    factors[f] <-- factor;
   }
+
+  // Constraint have to be quadratic, so we have to multiply one by one.
+  cumulative[0] <== factors[0];
+  for (var i = 1; i < d; i++) {
+    cumulative[i] <== factors[i] * cumulative[i-1];
+  }
+
+  cumulative[d-1] === n;
 }
 
-component main = Fibonacci(5);
+component main = Factors(3);
